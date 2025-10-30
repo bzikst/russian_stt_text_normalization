@@ -47,13 +47,18 @@ russian-stt-text-normalization = { git = "https://github.com/bzikst/russian_stt_
 ## Usage
 
 ```python
-from normalizer import Normalizer
+from russian_stt_text_normalization import Normalizer
 
 text = 'С 12.01.1943 г. площадь сельсовета — 1785,5 га.'
 
 norm = Normalizer()
 result = norm.norm_text(text)
 print(result)
+```
+
+Также поддерживается старый импорт (для обратной совместимости):
+```python
+from russian_stt_text_normalization.normalizer import Normalizer
 ```
 
 ```
