@@ -1,0 +1,7 @@
+include README.md
+include LICENSE
+include UPGRADE.md
+include *.pt
+include jit_s2s.pt
+include jit_s2s_v2.pt
+

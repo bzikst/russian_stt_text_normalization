@@ -18,12 +18,13 @@ Homepage = "https://github.com/bzikst/russian_stt_text_normalization"
 Repository = "https://github.com/bzikst/russian_stt_text_normalization"
 
 [build-system]
-requires = ["setuptools>=45", "wheel"]
+requires = ["setuptools>=45", "wheel", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 py-modules = ["normalizer"]
+include-package-data = true
 
 [tool.setuptools.package-data]
-"*" = ["*.pt"]
+"" = ["*.pt", "jit_s2s.pt", "jit_s2s_v2.pt"]
 
