@@ -3,6 +3,7 @@ import torch
 from string import printable, punctuation
 from tqdm import tqdm
 import warnings
+from pathlib import Path
 
 
 class Normalizer:
@@ -15,9 +16,66 @@ class Normalizer:
 
         self.init_vocabs()
 
-        self.model = torch.jit.load(jit_model, map_location=device)
+        # Определяем путь к модели
+        model_path = self._resolve_model_path(jit_model)
+        
+        # Загружаем модель
+        try:
+            self.model = torch.jit.load(str(model_path), map_location=device)
+        except RuntimeError as e:
+            if "Legacy model format" in str(e) or "not supported on mobile" in str(e):
+                raise RuntimeError(
+                    f"Модель {model_path} использует устаревший формат PyTorch JIT.\n"
+                    f"Текущая версия PyTorch: {torch.__version__}\n\n"
+                    f"Для решения проблемы:\n"
+                    f"1. Конвертируйте модель в новый формат (см. UPGRADE.md)\n"
+                    f"2. Или используйте PyTorch 1.x: pip install 'torch<2.0'"
+                ) from e
+            else:
+                raise
+        
         self.model.eval()
         self.max_len = 150
+    
+    def _resolve_model_path(self, jit_model: str) -> Path:
+        """Определяет абсолютный путь к файлу модели.
+        
+        Приоритет:
+        1. jit_s2s_v2.pt (новый формат) в директории модуля
+        2. Указанный путь (если абсолютный)
+        3. jit_model в директории модуля
+        4. jit_model относительно текущей директории
+        """
+        module_dir = Path(__file__).parent
+        
+        # Пробуем найти новый формат модели
+        v2_model = module_dir / "jit_s2s_v2.pt"
+        if v2_model.exists():
+            return v2_model
+        
+        # Если путь абсолютный, используем его
+        model_path = Path(jit_model)
+        if model_path.is_absolute():
+            if not model_path.exists():
+                raise FileNotFoundError(f"Модель не найдена: {model_path}")
+            return model_path
+        
+        # Ищем в директории модуля
+        module_model = module_dir / jit_model
+        if module_model.exists():
+            return module_model
+        
+        # Ищем относительно текущей директории
+        if model_path.exists():
+            return model_path
+        
+        raise FileNotFoundError(
+            f"Модель не найдена: {jit_model}\n"
+            f"Искали в:\n"
+            f"  - {v2_model}\n"
+            f"  - {module_model}\n"
+            f"  - {model_path.absolute()}"
+        )
 
     def init_vocabs(self):
         # Initializes source and target vocabularies

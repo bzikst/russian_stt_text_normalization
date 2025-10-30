@@ -1,0 +1,29 @@
+[project]
+name = "russian-stt-text-normalization"
+version = "1.0.1"
+description = "Russian text normalization for speech-to-text systems"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [
+    {name = "snakers4"},
+]
+dependencies = [
+    "torch>=1.4.0",
+    "tqdm",
+]
+
+[project.urls]
+Homepage = "https://github.com/bzikst/russian_stt_text_normalization"
+Repository = "https://github.com/bzikst/russian_stt_text_normalization"
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["normalizer"]
+
+[tool.setuptools.package-data]
+"*" = ["*.pt"]
+
